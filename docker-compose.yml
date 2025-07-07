@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    container_name: autocampos-frontend
+    ports:
+      # Mapeia a porta 3000 do seu computador para a porta 80 do contêiner (onde o Nginx está rodando)
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - microservicos-net
+    environment: # Adicione esta seção
+      - REACT_APP_API_URL=http://web:8000 # O nome do serviço do seu backend é 'web'
+
+networks:
+  microservicos-net:
+    external: true
