@@ -62,11 +62,14 @@ import { useNavigate } from 'react-router-dom';
 function Login({ setAutenticado }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   function handleSubmit(event) {
     event.preventDefault();
+    // Aqui você pode passar isAdmin para o contexto global ou lógica de autenticação
     setAutenticado(true);
+    // Exemplo: console.log('Usuário é admin?', isAdmin);
     navigate('/home');
   }
 
@@ -75,7 +78,7 @@ function Login({ setAutenticado }) {
       className="d-flex align-items-center justify-content-center"
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+        background: 'linear-gradient(135deg, #FFD600 0%, #FFC107 100%)',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
     >
@@ -87,20 +90,15 @@ function Login({ setAutenticado }) {
           borderRadius: 15,
           padding: '2rem',
           boxShadow: '0 8px 16px rgba(0,0,0,0.25)',
+          background: '#fffde7',
+          border: '2px solid #FFD600',
         }}
       >
         <div className="text-center mb-4">
-          {/* Logo ou ícone de carro */}
-          <img
-            src="https://img.icons8.com/ios-filled/64/2a5298/car.png"
-            alt="Marketplace de Concessionária"
-            style={{ marginBottom: 16 }}
-          />
-          <h2 style={{ color: '#2a5298', fontWeight: '700', letterSpacing: 1 }}>
-            AutoCampos
-          </h2>
-          <p style={{ color: '#555', fontSize: 14, marginTop: 4 }}>
-            Funcionarios e Administradores
+          {/* Logo AutoCampos */}
+          <img src="/logo.png" alt="AutoCampos Logo" style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain', marginBottom: 2 }} />
+          <p style={{ color: '#111', fontSize: 14, marginTop: 0, fontWeight: 600, marginBottom: 0 }}>
+            Funcionários e Administradores
           </p>
         </div>
         <form onSubmit={handleSubmit}>
@@ -108,7 +106,7 @@ function Login({ setAutenticado }) {
             <label
               htmlFor="email"
               className="form-label"
-              style={{ fontWeight: '600', color: '#2a5298' }}
+              style={{ fontWeight: '600', color: '#111' }}
             >
               E-mail
             </label>
@@ -120,14 +118,57 @@ function Login({ setAutenticado }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ borderRadius: 8, padding: '0.75rem 1rem' }}
+              style={{ borderRadius: 8, padding: '0.75rem 1rem', border: '2px solid #111', background: '#fffde7', color: '#111' }}
             />
+          </div>
+          <div className="mb-3 d-flex align-items-center gap-2">
+            <label htmlFor="isAdmin" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: 0, gap: 4 }}>
+              <span style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, marginRight: 4 }}>
+                <input
+                  type="checkbox"
+                  id="isAdmin"
+                  checked={isAdmin}
+                  onChange={e => setIsAdmin(e.target.checked)}
+                  style={{ opacity: 0, width: 44, height: 24, margin: 0, position: 'absolute', left: 0, top: 0, cursor: 'pointer' }}
+                />
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: 44,
+                    height: 24,
+                    borderRadius: 12,
+                    background: isAdmin ? 'linear-gradient(90deg, #FFD600 60%, #FFC107 100%)' : '#ddd',
+                    transition: 'background 0.2s',
+                    boxShadow: isAdmin ? '0 2px 8px 0 #FFD60044' : '0 1px 4px 0 #bbb2',
+                  }}
+                ></span>
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 3,
+                    left: isAdmin ? 24 : 3,
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: isAdmin ? '#111' : '#fff',
+                    boxShadow: '0 1px 4px 0 #bbb2',
+                    transition: 'left 0.2s, background 0.2s',
+                    border: isAdmin ? '2px solid #FFD600' : '2px solid #bbb',
+                  }}
+                ></span>
+              </span>
+              <span style={{ fontWeight: 700, color: '#111', fontSize: 15, letterSpacing: 0.2 }}>
+                Sou administrador
+              </span>
+            </label>
           </div>
           <div className="mb-4">
             <label
               htmlFor="senha"
               className="form-label"
-              style={{ fontWeight: '600', color: '#2a5298' }}
+              style={{ fontWeight: '600', color: '#111' }}
             >
               Senha
             </label>
@@ -139,37 +180,32 @@ function Login({ setAutenticado }) {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               required
-              style={{ borderRadius: 8, padding: '0.75rem 1rem' }}
+              style={{ borderRadius: 8, padding: '0.75rem 1rem', border: '2px solid #111', background: '#fffde7', color: '#111' }}
             />
           </div>
           <button
             type="submit"
             className="btn"
             style={{
-              backgroundColor: '#2a5298',
-              color: 'white',
+              backgroundColor: '#111',
+              color: '#FFD600',
               fontWeight: '700',
               borderRadius: 8,
               padding: '0.75rem',
               width: '100%',
               letterSpacing: 1,
+              border: 'none',
+              boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)',
               transition: 'background-color 0.3s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#1e3c72')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#2a5298')}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = '#FFD600')}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = '#111')}
+            onMouseOver={(e) => (e.target.style.color = '#111')}
+            onMouseOut={(e) => (e.target.style.color = '#FFD600')}
           >
             Entrar
           </button>
         </form>
-        <p
-          className="text-center mt-3"
-          style={{ fontSize: 13, color: '#777' }}
-        >
-          Não tem uma conta?{' '}
-          <a href="/register" style={{ color: '#2a5298', fontWeight: '600' }}>
-            Cadastre-se
-          </a>
-        </p>
       </div>
     </div>
   );

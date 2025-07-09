@@ -1,3 +1,7 @@
 npm install react-router-dom
 npm install bootstrap
 npm start
+# npm install react-chartjs-2 chart.js
+# npm install chart.js
+
+# # npm install chart.js@^4.4.0 react-chartjs-2@^5.2.0
