@@ -36,7 +36,7 @@ function UserForm() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            setFormData(data); // Preenche o formulário com os dados do usuário
+            setFormData(data);
         } catch (e) {
             setError("Falha ao carregar dados do usuário: " + e.message);
             console.error("Erro ao buscar dados do usuário:", e);

@@ -65,13 +65,13 @@ function VendaManagement() {
                     <thead>
                         <tr>
                             <th style={styles.th}>ID</th>
-                            <th style={styles.th}>Carro ID</th>
-                            <th style={styles.th}>Moto ID</th>
-                            <th style={styles.th}>Cliente ID</th>
-                            <th style={styles.th}>Funcionário ID</th>
+                            <th style={styles.th}>Carro</th>
+                            <th style={styles.th}>Moto</th>
+                            <th style={styles.th}>Cliente</th>
+                            <th style={styles.th}>Funcionário</th>
                             <th style={styles.th}>Data da Venda</th>
                             <th style={styles.th}>Valor Total</th>
-                            <th style={styles.th}>Forma Pagamento</th>
+                            <th style={styles.th}>Comissão</th>
                             <th style={styles.th}>Ações</th>
                         </tr>
                     </thead>
@@ -79,17 +79,19 @@ function VendaManagement() {
                         {vendas.map((venda) => (
                             <tr key={venda.id} style={styles.tr}>
                                 <td style={styles.td}>{venda.id}</td>
-                                <td style={styles.td}>{venda.carro_id || 'N/A'}</td>
-                                <td style={styles.td}>{venda.moto_id || 'N/A'}</td>
-                                <td style={styles.td}>{venda.cliente_id}</td>
-                                <td style={styles.td}>{venda.funcionario_id}</td>
+                                <td style={styles.td}>{venda.carro ? `${venda.carro.modelo} (${venda.carro.marca} - ${venda.carro.ano})` : 'N/A'}</td>
+                                <td style={styles.td}>{venda.moto ? `${venda.moto.modelo} (${venda.moto.marca} - ${venda.moto.ano})` : 'N/A'}</td>
+                                <td style={styles.td}>{venda.cliente ? venda.cliente.nome : venda.cliente_id}</td>
+                                <td style={styles.td}>{venda.funcionario && venda.funcionario.usuario ? venda.funcionario.usuario.nome : venda.funcionario_id}</td>
                                 <td style={styles.td}>{new Date(venda.data_venda).toLocaleDateString()}</td>
-                                <td style={styles.td}>R$ {parseFloat(venda.valor_total).toFixed(2)}</td>
-                                <td style={styles.td}>{venda.forma_pagamento}</td>
+                                <td style={styles.td}>R$ {parseFloat(venda.valor_final).toFixed(2)}</td>
+                                <td style={styles.td}>{venda.comissao_venda !== undefined && venda.comissao_venda !== null ? `R$ ${parseFloat(venda.comissao_venda).toFixed(2)}` : '-'}</td>
                                 <td style={styles.td}>
-                                    <button onClick={() => navigate(`/vendas/view/${venda.id}`)} style={styles.actionButton}>Ver Detalhes</button>
-                                    <button onClick={() => navigate(`/vendas/edit/${venda.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
-                                    <button onClick={() => handleDelete(venda.id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
+                                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                                        <button onClick={() => navigate(`/vendas/view/${venda.id}`)} style={styles.actionButton}>Ver Detalhes</button>
+                                        <button onClick={() => navigate(`/vendas/edit/${venda.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
+                                        <button onClick={() => handleDelete(venda.id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

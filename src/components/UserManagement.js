@@ -1,13 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AdminManagement from './AdminManagement';
+
 
 function UserManagement() {
+    const [activeTab, setActiveTab] = useState('usuarios');
+
+    return (
+        <div style={styles.container}>
+            <h1 style={styles.title}>Gerenciamento de Usuários</h1>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+                <button
+                    style={{
+                        ...styles.tabButton,
+                        background: activeTab === 'usuarios' ? '#FFD600' : '#eee',
+                        color: activeTab === 'usuarios' ? '#111' : '#555',
+                        borderBottom: activeTab === 'usuarios' ? '3px solid #FFD600' : '3px solid transparent',
+                    }}
+                    onClick={() => setActiveTab('usuarios')}
+                >Usuários</button>
+                <button
+                    style={{
+                        ...styles.tabButton,
+                        background: activeTab === 'admins' ? '#FFD600' : '#eee',
+                        color: activeTab === 'admins' ? '#111' : '#555',
+                        borderBottom: activeTab === 'admins' ? '3px solid #FFD600' : '3px solid transparent',
+                    }}
+                    onClick={() => setActiveTab('admins')}
+                >Usuários Admins</button>
+            </div>
+            {activeTab === 'usuarios' ? <UsuariosTab /> : <AdminManagement />}
+        </div>
+    );
+}
+
+// Conteúdo da aba de usuários (código original)
+function UsuariosTab() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-    // URL base da sua API de backend (o nome do serviço 'web' na rede Docker)
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
     useEffect(() => {
@@ -22,7 +54,7 @@ function UserManagement() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            setUsers(data);
+            setUsers(data.map(u => ({ ...u, isAdmin: u.isAdmin ?? false })));
         } catch (e) {
             setError("Falha ao carregar usuários: " + e.message);
             console.error("Erro ao buscar usuários:", e);
@@ -40,7 +72,6 @@ function UserManagement() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                // Remove o usuário da lista localmente após a exclusão bem-sucedida
                 setUsers(users.filter(user => user.id !== userId));
                 alert(`Usuário ${userName} excluído com sucesso!`);
             } catch (e) {
@@ -51,12 +82,17 @@ function UserManagement() {
         }
     };
 
+    // Mock: alterna admin localmente (substitua por chamada real ao backend)
+    const handleToggleAdmin = (userId) => {
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, isAdmin: !u.isAdmin } : u));
+        // Aqui você faria a chamada para o backend para promover/rebaixar admin
+    };
+
     if (loading) return <div style={styles.container}>Carregando usuários...</div>;
     if (error) return <div style={styles.container}><p style={styles.errorText}>{error}</p></div>;
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Gerenciamento de Usuários</h1>
+        <>
             <div style={styles.headerActions}>
                 <Link to="/usuarios/create" style={styles.addButton}>+ Adicionar Novo Usuário</Link>
             </div>
@@ -70,6 +106,7 @@ function UserManagement() {
                             <th style={styles.th}>Nome</th>
                             <th style={styles.th}>CPF</th>
                             <th style={styles.th}>Email</th>
+                            <th style={styles.th}>Admin?</th>
                             <th style={styles.th}>Ações</th>
                         </tr>
                     </thead>
@@ -80,6 +117,50 @@ function UserManagement() {
                                 <td style={styles.td}>{user.nome}</td>
                                 <td style={styles.td}>{user.cpf}</td>
                                 <td style={styles.td}>{user.email}</td>
+                                <td style={{ ...styles.td, textAlign: 'center' }}>
+                                    <label style={{ display: 'inline-block', cursor: 'pointer', margin: 0, position: 'relative', minWidth: 44 }}>
+                                        <input
+                                            type='checkbox'
+                                            checked={user.isAdmin}
+                                            onChange={() => handleToggleAdmin(user.id)}
+                                            style={{
+                                                opacity: 0,
+                                                width: 40,
+                                                height: 24,
+                                                position: 'absolute',
+                                                left: 0,
+                                                top: 0,
+                                                margin: 0,
+                                                zIndex: 2,
+                                                cursor: 'pointer',
+                                            }}
+                                            aria-label={`Tornar ${user.nome} admin`}
+                                        />
+                                        <span style={{
+                                            display: 'inline-block',
+                                            width: 40,
+                                            height: 24,
+                                            background: user.isAdmin ? '#FFD600' : '#ccc',
+                                            borderRadius: 12,
+                                            position: 'relative',
+                                            transition: 'background 0.2s',
+                                            boxShadow: user.isAdmin ? '0 2px 6px #ffe06680' : '0 1px 2px #0001',
+                                        }}>
+                                            <span style={{
+                                                position: 'absolute',
+                                                left: user.isAdmin ? 20 : 2,
+                                                top: 2,
+                                                width: 20,
+                                                height: 20,
+                                                background: user.isAdmin ? '#111' : '#fff',
+                                                borderRadius: '50%',
+                                                transition: 'left 0.2s, background 0.2s',
+                                                boxShadow: '0 1px 4px #0002',
+                                                border: user.isAdmin ? '2px solid #FFD600' : '1.5px solid #bbb',
+                                            }} />
+                                        </span>
+                                    </label>
+                                </td>
                                 <td style={styles.td}>
                                     <button onClick={() => navigate(`/usuarios/view/${user.id}`)} style={styles.actionButton}>Ver Detalhes</button>
                                     <button onClick={() => navigate(`/usuarios/edit/${user.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
@@ -90,7 +171,7 @@ function UserManagement() {
                     </tbody>
                 </table>
             )}
-        </div>
+        </>
     );
 }
 
@@ -141,6 +222,19 @@ const styles = {
     },
     tr: {
         backgroundColor: 'white',
+    },
+    tabButton: {
+        padding: '10px 24px',
+        border: 'none',
+        borderRadius: '8px 8px 0 0',
+        fontWeight: 600,
+        fontSize: '1em',
+        cursor: 'pointer',
+        outline: 'none',
+        marginRight: 2,
+        marginBottom: -2,
+        boxShadow: '0 1px 2px #0001',
+        transition: 'background 0.2s, color 0.2s, border-bottom 0.2s',
     },
     actionButton: {
         backgroundColor: '#007bff',

@@ -11,8 +11,8 @@ function VendaForm() {
         cliente_id: '',
         funcionario_id: '',
         data_venda: '', // Formato YYYY-MM-DD
-        valor_total: '',
-        forma_pagamento: '',
+        valor_final: '',
+        comissao_venda: '',
         observacoes: '',
     });
     const [carros, setCarros] = useState([]);
@@ -105,14 +105,23 @@ function VendaForm() {
 
         try {
             let response;
-            const payload = {
+            // Monta o payload sem o campo não selecionado
+            let payload = {
                 ...formData,
-                carro_id: formData.carro_id ? parseInt(formData.carro_id) : null,
-                moto_id: formData.moto_id ? parseInt(formData.moto_id) : null,
                 cliente_id: parseInt(formData.cliente_id),
                 funcionario_id: parseInt(formData.funcionario_id),
-                valor_total: parseFloat(formData.valor_total),
+                valor_final: parseFloat(formData.valor_final),
+                comissao_venda: formData.comissao_venda !== '' ? parseFloat(formData.comissao_venda) : null,
             };
+            // Remove campo forma_pagamento do payload (caso ainda exista)
+            if ('forma_pagamento' in payload) delete payload.forma_pagamento;
+            if (formData.carro_id) {
+                payload.carro_id = parseInt(formData.carro_id);
+                delete payload.moto_id;
+            } else if (formData.moto_id) {
+                payload.moto_id = parseInt(formData.moto_id);
+                delete payload.carro_id;
+            }
 
             if (isCreateMode) {
                 response = await fetch(`${API_BASE_URL}/api/v1/vendas/create`, {
@@ -245,12 +254,12 @@ function VendaForm() {
                     />
                 </div>
                 <div style={styles.formGroup}>
-                    <label htmlFor="valor_total" style={styles.label}>Valor Total:</label>
+                    <label htmlFor="valor_final" style={styles.label}>Valor Total:</label>
                     <input
                         type="number"
-                        id="valor_total"
-                        name="valor_total"
-                        value={formData.valor_total}
+                        id="valor_final"
+                        name="valor_final"
+                        value={formData.valor_final}
                         onChange={handleChange}
                         readOnly={isViewMode}
                         required
@@ -259,18 +268,20 @@ function VendaForm() {
                     />
                 </div>
                 <div style={styles.formGroup}>
-                    <label htmlFor="forma_pagamento" style={styles.label}>Forma de Pagamento:</label>
+                    <label htmlFor="comissao_venda" style={styles.label}>Comissão da Venda:</label>
                     <input
-                        type="text"
-                        id="forma_pagamento"
-                        name="forma_pagamento"
-                        value={formData.forma_pagamento}
+                        type="number"
+                        id="comissao_venda"
+                        name="comissao_venda"
+                        value={formData.comissao_venda}
                         onChange={handleChange}
                         readOnly={isViewMode}
-                        required
+                        step="0.01"
+                        min="0"
                         style={styles.input}
                     />
                 </div>
+                {/* Campo de forma de pagamento removido */}
                 <div style={styles.formGroup}>
                     <label htmlFor="observacoes" style={styles.label}>Observações:</label>
                     <textarea
@@ -286,20 +297,18 @@ function VendaForm() {
 
                 {error && <p style={styles.errorText}>{error}</p>}
 
-                <div style={styles.buttonGroup}>
+                <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 32 }}>
                     {isViewMode ? (
                         <>
-                            <button type="button" onClick={() => navigate(`/vendas/edit/${id}`)} style={styles.actionButton}>Editar</button>
-                            <button type="button" onClick={() => navigate('/vendas')} style={{ ...styles.actionButton, ...styles.cancelButton }}>Voltar</button>
+                            <button type="button" onClick={() => navigate(`/vendas/edit/${id}`)} style={{ ...styles.actionButton, backgroundColor: '#ffc107', color: '#222', minWidth: 120 }}>Editar</button>
+                            <button type="button" onClick={() => navigate('/vendas')} style={{ ...styles.actionButton, ...styles.cancelButton, minWidth: 120 }}>Voltar</button>
                         </>
                     ) : (
                         <>
-                            <button type="submit" disabled={isSubmitting} style={styles.actionButton}>
+                            <button type="submit" disabled={isSubmitting} style={{ ...styles.actionButton, minWidth: 120 }}>
                                 {isSubmitting ? 'Salvando...' : (isCreateMode ? 'Registrar Venda' : 'Salvar Alterações')}
                             </button>
-                            <button type="button" onClick={() => navigate(isEditMode ? `/vendas/view/${id}` : '/vendas')} style={{ ...styles.actionButton, ...styles.cancelButton }}>
-                                Cancelar
-                            </button>
+                            <button type="button" onClick={() => navigate(isEditMode ? `/vendas/view/${id}` : '/vendas')} style={{ ...styles.actionButton, ...styles.cancelButton, minWidth: 120 }}>Cancelar</button>
                         </>
                     )}
                 </div>

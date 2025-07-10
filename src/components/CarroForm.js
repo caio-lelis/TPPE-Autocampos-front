@@ -173,15 +173,21 @@ function CarroForm() {
                 </div>
                 <div style={styles.formGroup}>
                     <label htmlFor="tipo_combustivel" style={styles.label}>Tipo de Combustível:</label>
-                    <input
-                        type="text"
+                    <select
                         id="tipo_combustivel"
                         name="tipo_combustivel"
                         value={formData.tipo_combustivel}
                         onChange={handleChange}
-                        readOnly={isViewMode}
+                        disabled={isViewMode}
+                        required
                         style={styles.input}
-                    />
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="etanol">Etanol</option>
+                        <option value="gasolina">Gasolina</option>
+                        <option value="flex">Flex</option>
+                        <option value="diesel">Diesel</option>
+                    </select>
                 </div>
                 <div style={styles.formGroup}>
                     <label htmlFor="preco" style={styles.label}>Preço:</label>
@@ -223,27 +229,37 @@ function CarroForm() {
                 </div>
                 <div style={styles.formGroup}>
                     <label htmlFor="tipo_direcao" style={styles.label}>Tipo de Direção:</label>
-                    <input
-                        type="text"
+                    <select
                         id="tipo_direcao"
                         name="tipo_direcao"
                         value={formData.tipo_direcao}
                         onChange={handleChange}
-                        readOnly={isViewMode}
+                        disabled={isViewMode}
+                        required
                         style={styles.input}
-                    />
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="hidráulica">Hidráulica</option>
+                        <option value="mecânica">Mecânica</option>
+                        <option value="elétrica">Elétrica</option>
+                        <option value="eletrohidráulica">Eletrohidráulica</option>
+                    </select>
                 </div>
                 <div style={styles.formGroup}>
                     <label htmlFor="tracao" style={styles.label}>Tração:</label>
-                    <input
-                        type="text"
+                    <select
                         id="tracao"
                         name="tracao"
                         value={formData.tracao}
                         onChange={handleChange}
-                        readOnly={isViewMode}
+                        disabled={isViewMode}
+                        required
                         style={styles.input}
-                    />
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="dianteira">Dianteira</option>
+                        <option value="traseira">Traseira</option>
+                    </select>
                 </div>
                 <div style={styles.formGroup}>
                     <label htmlFor="consumo_cidade" style={styles.label}>Consumo Cidade (km/l):</label>

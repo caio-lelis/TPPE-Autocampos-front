@@ -1,4 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+// Mock de usuários (normal e admin)
+const mockUsuarios = [
+  { id: 1, nome: 'João Silva', email: 'joao@email.com', isAdmin: true },
+  { id: 2, nome: 'Maria Souza', email: 'maria@email.com', isAdmin: false },
+  { id: 3, nome: 'Carlos Lima', email: 'carlos@email.com', isAdmin: false },
+  { id: 4, nome: 'Ana Paula', email: 'ana@email.com', isAdmin: true },
+];
 // Ícones SVG simples para os cards
 const icons = {
   clientes: (
@@ -22,6 +29,8 @@ const totalVendas = 120000; // em reais
 const comissao = totalVendas * 0.05; // 5% de comissão
 
 function Funcionario() {
+
+
   return (
     <>
       {/* Barra superior simples */}

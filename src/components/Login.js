@@ -65,12 +65,29 @@ function Login({ setAutenticado }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
-  function handleSubmit(event) {
+  const [loginError, setLoginError] = useState(null);
+
+  async function handleSubmit(event) {
     event.preventDefault();
-    // Aqui você pode passar isAdmin para o contexto global ou lógica de autenticação
-    setAutenticado(true);
-    // Exemplo: console.log('Usuário é admin?', isAdmin);
-    navigate('/home');
+    setLoginError(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/v1/usuarios/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        setLoginError(data.detail || 'Email ou senha inválidos.');
+        return;
+      }
+      const user = await response.json();
+      setAutenticado(true);
+      // Aqui você pode salvar user no contexto/global/localStorage se quiser
+      navigate('/home');
+    } catch (e) {
+      setLoginError('Erro ao conectar com o servidor.');
+    }
   }
 
   return (
@@ -102,6 +119,7 @@ function Login({ setAutenticado }) {
           </p>
         </div>
         <form onSubmit={handleSubmit}>
+          {loginError && <div style={{ color: 'red', textAlign: 'center', marginBottom: 10 }}>{loginError}</div>}
           <div className="mb-3">
             <label
               htmlFor="email"

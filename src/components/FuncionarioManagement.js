@@ -66,6 +66,8 @@ function FuncionarioManagement() {
                         <tr>
                             <th style={styles.th}>ID</th>
                             <th style={styles.th}>ID Usuário</th>
+                            <th style={styles.th}>Nome</th>
+                            <th style={styles.th}>Email</th>
                             <th style={styles.th}>Rendimento Mensal</th>
                             <th style={styles.th}>Ações</th>
                         </tr>
@@ -75,12 +77,16 @@ function FuncionarioManagement() {
                             <tr key={func.id} style={styles.tr}>
                                 <td style={styles.td}>{func.id}</td>
                                 <td style={styles.td}>{func.usuario_id}</td>
+                                <td style={styles.td}>{func.usuario?.nome || '-'}</td>
+                                <td style={styles.td}>{func.usuario?.email || '-'}</td>
                                 <td style={styles.td}>R$ {parseFloat(func.rendimento_mensal).toFixed(2)}</td>
-                                <td style={styles.td}>
-                                    <button onClick={() => navigate(`/funcionarios/view/${func.id}`)} style={styles.actionButton}>Ver Detalhes</button>
-                                    <button onClick={() => navigate(`/funcionarios/edit/${func.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
-                                    <button onClick={() => navigate(`/funcionarios/dashboard/${func.id}`)} style={{ ...styles.actionButton, ...styles.dashboardButton }}>Dashboard</button>
-                                    <button onClick={() => handleDelete(func.id, func.usuario_id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
+                                <td style={{ ...styles.td, minWidth: 180 }}>
+                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                                        <button onClick={() => navigate(`/funcionarios/view/${func.id}`)} style={styles.actionButton}>Ver Detalhes</button>
+                                        <button onClick={() => navigate(`/funcionarios/edit/${func.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
+                                        <button onClick={() => navigate(`/funcionarios/dashboard/${func.id}`)} style={{ ...styles.actionButton, ...styles.dashboardButton }}>Dashboard</button>
+                                        <button onClick={() => handleDelete(func.id, func.usuario_id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
