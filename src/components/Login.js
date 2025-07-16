@@ -59,19 +59,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Login({ setAutenticado }) {
+function Login({ setAutenticado, setUserType }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
 
   const [loginError, setLoginError] = useState(null);
+  const navigate = useNavigate();  // Define navigate para redirecionamento
 
   async function handleSubmit(event) {
     event.preventDefault();
     setLoginError(null);
+    // Define base URL e endpoint de login conforme tipo de usuário
+    const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    const endpoint = isAdmin ? '/admins/login' : '/funcionarios/login';
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/v1/usuarios/login`, {
+      const response = await fetch(`${baseURL}/api/v1${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -83,6 +86,8 @@ function Login({ setAutenticado }) {
       }
       const user = await response.json();
       setAutenticado(true);
+      // Define o tipo de usuário (admin ou funcionario)
+      setUserType(user.tipo);
       // Aqui você pode salvar user no contexto/global/localStorage se quiser
       navigate('/home');
     } catch (e) {

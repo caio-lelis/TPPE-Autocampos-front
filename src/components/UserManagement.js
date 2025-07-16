@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FiLogOut } from 'react-icons/fi'; // ícone de logout moderno
 import { Link, useNavigate } from 'react-router-dom';
 import AdminManagement from './AdminManagement';
 
@@ -82,10 +83,45 @@ function UsuariosTab() {
         }
     };
 
-    // Mock: alterna admin localmente (substitua por chamada real ao backend)
-    const handleToggleAdmin = (userId) => {
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, isAdmin: !u.isAdmin } : u));
-        // Aqui você faria a chamada para o backend para promover/rebaixar admin
+    const handleToggleAdmin = async (userId) => {
+        const user = users.find(u => u.id === userId);
+        try {
+            // Busca lista de admins existentes
+            const adminsResp = await fetch(`${API_BASE_URL}/api/v1/admins/get`);
+            const admins = await adminsResp.json();
+            const adm = admins.find(a => a.usuario_id === userId);
+            let response;
+            if (!user.isAdmin) {
+                // Promove a admin: atualiza se já existe, senão cria
+                if (adm) {
+                    response = await fetch(`${API_BASE_URL}/api/v1/admins/update/${adm.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usuario_id: userId, is_admin: true })
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/api/v1/admins/create`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usuario_id: userId, is_admin: true })
+                    });
+                }
+            } else {
+                // Revoga admin: atualiza flag is_admin para false
+                if (adm) {
+                    response = await fetch(`${API_BASE_URL}/api/v1/admins/update/${adm.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usuario_id: userId, is_admin: false })
+                    });
+                }
+            }
+            if (response && !response.ok) throw new Error(`Erro HTTP! status: ${response.status}`);
+            setUsers(prev => prev.map(u => u.id === userId ? { ...u, isAdmin: !u.isAdmin } : u));
+        } catch (e) {
+            setError('Falha ao atualizar status de administrador: ' + e.message);
+            console.error('Erro ao alternar admin:', e);
+        }
     };
 
     if (loading) return <div style={styles.container}>Carregando usuários...</div>;

@@ -130,7 +130,7 @@ function Home_geral() {
                   <p className="card-text text-secondary" style={{ minHeight: 40, color: '#333' }}>{veiculo.descricao}</p>
                   <div className="mt-auto">
                     <span className="badge fs-6 mb-2" style={{ background: '#FFD600', color: '#111', fontWeight: 700, fontSize: 18 }}>{formatarPreco(veiculo.preco)}</span>
-                    <button className="btn w-100 mt-2 fw-bold" style={{ borderRadius: 8, background: '#111', color: '#FFD600', border: 'none' }} onClick={() => alert(`Detalhes do: ${veiculo.nome}`)}>
+                    <button className="btn w-100 mt-2 fw-bold" style={{ borderRadius: 8, background: '#111', color: '#FFD600', border: 'none' }} onClick={() => navigate(`/detalhes/${veiculo.tipo}/${veiculo.id}`)}>
                       Ver detalhes
                     </button>
                   </div>
@@ -156,7 +156,7 @@ function Home_geral() {
                       <p className="card-text text-secondary" style={{ minHeight: 30, color: '#333' }}>{veiculo.descricao}</p>
                       <div className="mt-auto">
                         <span className="badge fs-6 mb-2" style={{ background: '#FFD600', color: '#111', fontWeight: 700, fontSize: 16 }}>{formatarPreco(veiculo.preco)}</span>
-                        <button className="btn w-100 mt-2 fw-bold" style={{ borderRadius: 8, background: '#111', color: '#FFD600', border: 'none' }} onClick={() => alert(`Detalhes do: ${veiculo.nome}`)}>
+                        <button className="btn w-100 mt-2 fw-bold" style={{ borderRadius: 8, background: '#111', color: '#FFD600', border: 'none' }} onClick={() => navigate(`/detalhes/${veiculo.tipo}/${veiculo.id}`)}>
                           Ver detalhes
                         </button>
                       </div>

@@ -11,6 +11,7 @@ COPY package*.json ./
 # Instala as dependências do projeto
 RUN npm install
 RUN npm install react-router-dom
+RUN npm install react-icons
 # Copia todo o resto do código-fonte para o diretório de trabalho
 COPY . .
 

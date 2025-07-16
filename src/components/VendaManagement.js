@@ -87,11 +87,9 @@ function VendaManagement() {
                                 <td style={styles.td}>R$ {parseFloat(venda.valor_final).toFixed(2)}</td>
                                 <td style={styles.td}>{venda.comissao_venda !== undefined && venda.comissao_venda !== null ? `R$ ${parseFloat(venda.comissao_venda).toFixed(2)}` : '-'}</td>
                                 <td style={styles.td}>
-                                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-                                        <button onClick={() => navigate(`/vendas/view/${venda.id}`)} style={styles.actionButton}>Ver Detalhes</button>
-                                        <button onClick={() => navigate(`/vendas/edit/${venda.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
-                                        <button onClick={() => handleDelete(venda.id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
-                                    </div>
+                                    <button onClick={() => navigate(`/vendas/view/${venda.id}`)} style={styles.actionButton}>Ver Detalhes</button>
+                                    <button onClick={() => navigate(`/vendas/edit/${venda.id}`)} style={{ ...styles.actionButton, ...styles.editButton }}>Editar</button>
+                                    <button onClick={() => handleDelete(venda.id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>Excluir</button>
                                 </td>
                             </tr>
                         ))}
