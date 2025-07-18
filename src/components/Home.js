@@ -52,20 +52,16 @@ const icons = {
   )
 };
 
-// Mock de dados com mais informações
-const mockData = {
-  vendasFuncionario: 12,
-  totalVendas: 120000,
-  comissao: 6000,
-  metaMensal: 15,
-  clientesAtivos: 28,
-  ultimaVenda: '2024-07-15'
-};
-
 function Home() {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userName] = useState('João Silva'); // Em uma implementação real, viria do contexto de autenticação
+  const [funcionarioId] = useState(1); // ID do funcionário logado - deve vir do contexto de autenticação
+  const [metricsData, setMetricsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -74,11 +70,63 @@ function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const progressPercentage = (mockData.vendasFuncionario / mockData.metaMensal) * 100;
+  useEffect(() => {
+    fetchMetrics();
+  }, [funcionarioId]);
+
+  const fetchMetrics = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/v1/home/funcionario/${funcionarioId}/metrics`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setMetricsData(data);
+    } catch (e) {
+      setError("Falha ao carregar métricas: " + e.message);
+      console.error("Erro ao buscar métricas:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCardClick = (path) => {
     navigate(path);
   };
+
+  const handleDashboardClick = () => {
+    navigate(`/funcionarios/dashboard/${funcionarioId}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="home-container">
+        <div className="loading-spinner">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Carregando...</span>
+          </div>
+          <p className="mt-3">Carregando painel...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="home-container">
+        <div className="error-container">
+          <div className="alert alert-danger" role="alert">
+            <h4 className="alert-heading">Erro!</h4>
+            <p>{error}</p>
+            <button className="btn btn-outline-danger" onClick={() => window.location.reload()}>
+              Tentar Novamente
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="home-container">
@@ -123,18 +171,18 @@ function Home() {
                     </div>
                     <div className="metric-info">
                       <span className="metric-label">Vendas Realizadas</span>
-                      <span className="metric-value">{mockData.vendasFuncionario}</span>
+                      <span className="metric-value">{metricsData?.total_vendas || 0}</span>
                     </div>
                   </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div 
                         className="progress-fill" 
-                        style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                        style={{ width: `${Math.min(metricsData?.progresso_meta || 0, 100)}%` }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {Math.round(progressPercentage)}% da meta
+                      {Math.round(metricsData?.progresso_meta || 0)}% da meta
                     </span>
                   </div>
                 </div>
@@ -149,7 +197,7 @@ function Home() {
                     <div className="metric-info">
                       <span className="metric-label">Total em Vendas</span>
                       <span className="metric-value">
-                        {mockData.totalVendas.toLocaleString('pt-BR', { 
+                        {(metricsData?.valor_total || 0).toLocaleString('pt-BR', { 
                           style: 'currency', 
                           currency: 'BRL',
                           minimumFractionDigits: 0
@@ -160,7 +208,7 @@ function Home() {
                   <div className="metric-footer">
                     <small className="text-muted">
                       <i className="fas fa-arrow-up text-success"></i>
-                      +12% vs. mês anterior
+                      Baseado em {metricsData?.total_vendas || 0} vendas
                     </small>
                   </div>
                 </div>
@@ -175,7 +223,7 @@ function Home() {
                     <div className="metric-info">
                       <span className="metric-label">Comissão Recebida</span>
                       <span className="metric-value">
-                        {mockData.comissao.toLocaleString('pt-BR', { 
+                        {(metricsData?.comissao_total || 0).toLocaleString('pt-BR', { 
                           style: 'currency', 
                           currency: 'BRL' 
                         })}
@@ -184,7 +232,7 @@ function Home() {
                   </div>
                   <div className="metric-footer">
                     <small className="text-muted">
-                      5% sobre vendas
+                      Sobre vendas realizadas
                     </small>
                   </div>
                 </div>
@@ -198,12 +246,12 @@ function Home() {
                     </div>
                     <div className="metric-info">
                       <span className="metric-label">Clientes Ativos</span>
-                      <span className="metric-value">{mockData.clientesAtivos}</span>
+                      <span className="metric-value">{metricsData?.clientes_ativos || 0}</span>
                     </div>
                   </div>
                   <div className="metric-footer">
                     <small className="text-muted">
-                      +5 novos este mês
+                      Clientes únicos atendidos
                     </small>
                   </div>
                 </div>
@@ -313,7 +361,7 @@ function Home() {
               <div className="col-lg-2 col-md-4 col-sm-6">
                 <div 
                   className="action-card" 
-                  onClick={() => handleCardClick('/funcionarios')}
+                  onClick={handleDashboardClick}
                 >
                   <div className="action-card-inner">
                     <div className="action-icon">
