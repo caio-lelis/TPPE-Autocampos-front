@@ -41,14 +41,6 @@ const icons = {
       <rect x="3" y="4" width="18" height="16" rx="3" fill="#FFD600" stroke="#111" strokeWidth="1.5"/>
       <path d="M8 10h8M8 14h6" stroke="#111" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
-  ),
-  dashboard: (
-    <svg width="48" height="48" fill="none" viewBox="0 0 24 24" className="card-icon">
-      <rect x="3" y="3" width="7" height="7" rx="2" fill="#FFD600" stroke="#111" strokeWidth="1.5"/>
-      <rect x="14" y="3" width="7" height="7" rx="2" fill="#FFD600" stroke="#111" strokeWidth="1.5"/>
-      <rect x="3" y="14" width="7" height="7" rx="2" fill="#FFD600" stroke="#111" strokeWidth="1.5"/>
-      <rect x="14" y="14" width="7" height="7" rx="2" fill="#FFD600" stroke="#111" strokeWidth="1.5"/>
-    </svg>
   )
 };
 
@@ -95,10 +87,6 @@ function Home() {
     navigate(path);
   };
 
-  const handleDashboardClick = () => {
-    navigate(`/funcionarios/dashboard/${funcionarioId}`);
-  };
-
   if (loading) {
     return (
       <div className="home-container">
@@ -137,7 +125,6 @@ function Home() {
             <div className="navbar-brand">
               <img src="/logo.png" alt="AutoCampos Logo" className="navbar-logo" />
               <div className="brand-text">
-                <span className="brand-title">AutoCampos</span>
                 <span className="brand-subtitle">Painel do Funcionário</span>
               </div>
             </div>
@@ -350,25 +337,6 @@ function Home() {
                     </div>
                     <h3 className="action-title">Anúncios</h3>
                     <p className="action-description">Publicações e promoções</p>
-                    <button className="action-button">
-                      <span>Acessar</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-lg-2 col-md-4 col-sm-6">
-                <div 
-                  className="action-card" 
-                  onClick={handleDashboardClick}
-                >
-                  <div className="action-card-inner">
-                    <div className="action-icon">
-                      {icons.dashboard}
-                    </div>
-                    <h3 className="action-title">Dashboard</h3>
-                    <p className="action-description">Métricas detalhadas</p>
                     <button className="action-button">
                       <span>Acessar</span>
                       <i className="fas fa-arrow-right"></i>
