@@ -5,8 +5,8 @@ services:
     build: .
     container_name: autocampos-frontend
     ports:
-      # Mapeia a porta 3000 do seu computador para a porta 80 do contêiner (onde o Nginx está rodando)
-      - "3000:80"
+      # Mapeia a porta configurável do host (default 8080) para a porta 80 do contêiner
+      - "${FRONTEND_PORT:-3002}:80"
     restart: unless-stopped
     networks:
       - microservicos-net
