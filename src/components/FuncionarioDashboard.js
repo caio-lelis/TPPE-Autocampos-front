@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './FuncionarioDashboard.css';
 
 function FuncionarioDashboard() {
     const { id } = useParams(); // ID do funcionário
@@ -8,6 +10,7 @@ function FuncionarioDashboard() {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedPeriod, setSelectedPeriod] = useState('month');
 
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -33,109 +36,301 @@ function FuncionarioDashboard() {
         }
     };
 
-    if (loading) return <div style={styles.container}>Carregando dashboard...</div>;
-    if (error) return <div style={styles.container}><p style={styles.errorText}>{error}</p></div>;
-    if (!dashboardData) return <div style={styles.container}><p>Nenhum dado de dashboard disponível.</p></div>;
+    const handlePeriodChange = (period) => {
+        setSelectedPeriod(period);
+        // Aqui você pode implementar lógica para recarregar dados baseado no período
+    };
 
-    return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Dashboard do Funcionário (ID: {dashboardData.funcionario_id})</h1>
-            <div style={styles.metricas}>
-                <div style={styles.metricaItem}>
-                    <h3>Total de Carros Vendidos:</h3>
-                    <p style={styles.metricaValue}>{dashboardData.metricas.total_carros_vendidos}</p>
+    const handleNewAnnouncement = () => {
+        navigate('/anuncios/create');
+    };
+
+    const handleViewSales = () => {
+        navigate('/vendas');
+    };
+
+    const handleViewVehicles = () => {
+        navigate('/veiculos');
+    };
+
+    if (loading) return (
+        <div className="dashboard-container">
+            <div className="loading-spinner">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Carregando...</span>
                 </div>
-                <div style={styles.metricaItem}>
-                    <h3>Total de Comissões:</h3>
-                    <p style={styles.metricaValue}>R$ {parseFloat(dashboardData.metricas.total_comissoes).toFixed(2)}</p>
-                </div>
-            </div>
-            {dashboardData.grafico && (
-                <div style={styles.graficoContainer}>
-                    <h2>Gráfico de Vendas</h2>
-                    <img src={dashboardData.grafico} alt="Gráfico de Vendas" style={styles.graficoImg} />
-                </div>
-            )}
-            <div style={styles.buttonGroup}>
-                <button type="button" onClick={() => navigate('/funcionarios')} style={{ ...styles.actionButton, ...styles.cancelButton }}>Voltar para Lista</button>
+                <p className="mt-3">Carregando dashboard...</p>
             </div>
         </div>
     );
-}
+    
+    if (error) return (
+        <div className="dashboard-container">
+            <div className="error-container">
+                <div className="alert alert-danger" role="alert">
+                    <h4 className="alert-heading">Erro!</h4>
+                    <p>{error}</p>
+                    <button className="btn btn-outline-danger" onClick={() => navigate('/funcionarios')}>
+                        Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+    
+    if (!dashboardData) return (
+        <div className="dashboard-container">
+            <div className="no-data-container">
+                <i className="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <p>Nenhum dado de dashboard disponível.</p>
+            </div>
+        </div>
+    );
 
-const styles = {
-    container: {
-        fontFamily: 'Arial, sans-serif',
-        padding: '20px',
-        maxWidth: '800px',
-        margin: '20px auto',
-        backgroundColor: '#f9f9f9',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    },
-    title: {
-        textAlign: 'center',
-        color: '#333',
-        marginBottom: '20px',
-    },
-    metricas: {
-        display: 'flex',
-        justifyContent: 'space-around',
-        marginBottom: '30px',
-        flexWrap: 'wrap',
-    },
-    metricaItem: {
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        textAlign: 'center',
-        minWidth: '200px',
-        margin: '10px',
-    },
-    metricaValue: {
-        fontSize: '2em',
-        fontWeight: 'bold',
-        color: '#007bff',
-    },
-    graficoContainer: {
-        textAlign: 'center',
-        marginTop: '30px',
-        padding: '20px',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    },
-    graficoImg: {
-        maxWidth: '100%',
-        height: 'auto',
-        marginTop: '15px',
-        border: '1px solid #eee',
-        borderRadius: '4px',
-    },
-    buttonGroup: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        marginTop: '20px',
-    },
-    actionButton: {
-        backgroundColor: '#007bff',
-        color: 'white',
-        padding: '10px 20px',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        fontSize: '1em',
-        marginRight: '10px',
-    },
-    cancelButton: {
-        backgroundColor: '#6c757d',
-    },
-    errorText: {
-        color: 'red',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    }
+    return (
+        <div className="dashboard-container">
+            {/* Header */}
+            <div className="dashboard-header">
+                <div className="container-fluid">
+                    <div className="row align-items-center">
+                        <div className="col-md-6">
+                            <h1 className="dashboard-title">
+                                <i className="fas fa-tachometer-alt me-3"></i>
+                                Dashboard Funcionário
+                            </h1>
+                            <p className="dashboard-subtitle">
+                                ID: {dashboardData.funcionario_id} | {new Date().toLocaleDateString('pt-BR')}
+                            </p>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="dashboard-actions">
+                                <button
+                                    className="btn btn-primary me-2"
+                                    onClick={handleNewAnnouncement}
+                                >
+                                    <i className="fas fa-plus me-2"></i>
+                                    Novo Anúncio
+                                </button>
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => navigate('/funcionarios')}
+                                >
+                                    <i className="fas fa-arrow-left me-2"></i>
+                                    Voltar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="dashboard-content">
+                <div className="container-fluid">
+                    {/* Period Selector */}
+                    <div className="row mb-4">
+                        <div className="col-12">
+                            <div className="period-selector">
+                                <button
+                                    className={`btn ${selectedPeriod === 'week' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    onClick={() => handlePeriodChange('week')}
+                                >
+                                    Semana
+                                </button>
+                                <button
+                                    className={`btn ${selectedPeriod === 'month' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    onClick={() => handlePeriodChange('month')}
+                                >
+                                    Mês
+                                </button>
+                                <button
+                                    className={`btn ${selectedPeriod === 'year' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    onClick={() => handlePeriodChange('year')}
+                                >
+                                    Ano
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Métricas Cards */}
+                    <div className="row mb-4">
+                        <div className="col-lg-3 col-md-6 mb-4">
+                            <div className="metric-card sales-card">
+                                <div className="metric-icon">
+                                    <i className="fas fa-car"></i>
+                                </div>
+                                <div className="metric-content">
+                                    <h3 className="metric-title">Carros Vendidos</h3>
+                                    <p className="metric-value">{dashboardData.metricas.total_carros_vendidos}</p>
+                                    <span className="metric-change positive">
+                                        <i className="fas fa-arrow-up"></i> +12%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 col-md-6 mb-4">
+                            <div className="metric-card commission-card">
+                                <div className="metric-icon">
+                                    <i className="fas fa-dollar-sign"></i>
+                                </div>
+                                <div className="metric-content">
+                                    <h3 className="metric-title">Comissões</h3>
+                                    <p className="metric-value">R$ {parseFloat(dashboardData.metricas.total_comissoes).toFixed(2)}</p>
+                                    <span className="metric-change positive">
+                                        <i className="fas fa-arrow-up"></i> +8%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 col-md-6 mb-4">
+                            <div className="metric-card target-card">
+                                <div className="metric-icon">
+                                    <i className="fas fa-target"></i>
+                                </div>
+                                <div className="metric-content">
+                                    <h3 className="metric-title">Meta do Mês</h3>
+                                    <p className="metric-value">75%</p>
+                                    <span className="metric-change neutral">
+                                        <i className="fas fa-minus"></i> Meta
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 col-md-6 mb-4">
+                            <div className="metric-card rating-card">
+                                <div className="metric-icon">
+                                    <i className="fas fa-star"></i>
+                                </div>
+                                <div className="metric-content">
+                                    <h3 className="metric-title">Avaliação</h3>
+                                    <p className="metric-value">4.8</p>
+                                    <span className="metric-change positive">
+                                        <i className="fas fa-arrow-up"></i> Excelente
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Charts and Quick Actions */}
+                    <div className="row">
+                        <div className="col-lg-8 mb-4">
+                            <div className="chart-container">
+                                <div className="chart-header">
+                                    <h3 className="chart-title">
+                                        <i className="fas fa-chart-line me-2"></i>
+                                        Vendas por Período
+                                    </h3>
+                                    <div className="chart-actions">
+                                        <button className="btn btn-sm btn-outline-primary">
+                                            <i className="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="chart-content">
+                                    {dashboardData.grafico ? (
+                                        <img 
+                                            src={dashboardData.grafico} 
+                                            alt="Gráfico de Vendas" 
+                                            className="chart-image"
+                                        />
+                                    ) : (
+                                        <div className="chart-placeholder">
+                                            <i className="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                            <p className="text-muted">Gráfico não disponível</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-4 mb-4">
+                            <div className="quick-actions-container">
+                                <h3 className="quick-actions-title">
+                                    <i className="fas fa-bolt me-2"></i>
+                                    Ações Rápidas
+                                </h3>
+                                <div className="quick-actions">
+                                    <button 
+                                        className="quick-action-btn"
+                                        onClick={handleViewSales}
+                                    >
+                                        <i className="fas fa-handshake"></i>
+                                        <span>Ver Vendas</span>
+                                    </button>
+                                    <button 
+                                        className="quick-action-btn"
+                                        onClick={handleViewVehicles}
+                                    >
+                                        <i className="fas fa-cars"></i>
+                                        <span>Veículos</span>
+                                    </button>
+                                    <button 
+                                        className="quick-action-btn"
+                                        onClick={() => navigate('/clientes')}
+                                    >
+                                        <i className="fas fa-users"></i>
+                                        <span>Clientes</span>
+                                    </button>
+                                    <button 
+                                        className="quick-action-btn"
+                                        onClick={() => navigate('/relatorios')}
+                                    >
+                                        <i className="fas fa-chart-pie"></i>
+                                        <span>Relatórios</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Performance Widget */}
+                            <div className="performance-widget">
+                                <h4 className="widget-title">Performance</h4>
+                                <div className="performance-item">
+                                    <span className="performance-label">Vendas este mês</span>
+                                    <div className="performance-progress">
+                                        <div className="progress">
+                                            <div 
+                                                className="progress-bar bg-success" 
+                                                style={{ width: '75%' }}
+                                            ></div>
+                                        </div>
+                                        <span className="performance-percent">75%</span>
+                                    </div>
+                                </div>
+                                <div className="performance-item">
+                                    <span className="performance-label">Meta comissão</span>
+                                    <div className="performance-progress">
+                                        <div className="progress">
+                                            <div 
+                                                className="progress-bar bg-warning" 
+                                                style={{ width: '60%' }}
+                                            ></div>
+                                        </div>
+                                        <span className="performance-percent">60%</span>
+                                    </div>
+                                </div>
+                                <div className="performance-item">
+                                    <span className="performance-label">Satisfação cliente</span>
+                                    <div className="performance-progress">
+                                        <div className="progress">
+                                            <div 
+                                                className="progress-bar bg-primary" 
+                                                style={{ width: '90%' }}
+                                            ></div>
+                                        </div>
+                                        <span className="performance-percent">90%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default FuncionarioDashboard;
