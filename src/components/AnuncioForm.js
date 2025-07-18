@@ -32,9 +32,9 @@ function AnuncioForm() {
     const fetchData = async () => {
         try {
             const [funcResponse, carrosResponse, motosResponse] = await Promise.all([
-                fetch(`${API_BASE_URL}/funcionarios/get`),
-                fetch(`${API_BASE_URL}/carros/get`),
-                fetch(`${API_BASE_URL}/motos/get`)
+                fetch(`${API_BASE_URL}/api/v1/funcionarios/get`),
+                fetch(`${API_BASE_URL}/api/v1/carros/get`),
+                fetch(`${API_BASE_URL}/api/v1/motos/get`)
             ]);
 
             if (funcResponse.ok) {
@@ -165,7 +165,7 @@ function AnuncioForm() {
             }
 
             // Enviar para API
-            const response = await fetch(`${API_BASE_URL}/anuncios/create-with-images`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/anuncios/create-with-images`, {
                 method: 'POST',
                 body: uploadData
             });

@@ -33,13 +33,13 @@ const AnuncioManager = () => {
 
     const fetchAnuncios = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/anuncios/get`);
+            const response = await axios.get(`${API_BASE_URL}/api/v1/anuncios/get`);
             setAnuncios(response.data);
             // fetch reference data
             const [resFun, resCar, resMoto] = await Promise.all([
-                axios.get(`${API_BASE_URL}/funcionarios/get`),
-                axios.get(`${API_BASE_URL}/carros/get`),
-                axios.get(`${API_BASE_URL}/motos/get`)
+                axios.get(`${API_BASE_URL}/api/v1/funcionarios/get`),
+                axios.get(`${API_BASE_URL}/api/v1/carros/get`),
+                axios.get(`${API_BASE_URL}/api/v1/motos/get`)
             ]);
             setFuncionarios(resFun.data);
             setCarros(resCar.data);
@@ -144,7 +144,7 @@ const AnuncioManager = () => {
 
             // Enviar para API
             await axios.post(
-                `${API_BASE_URL}/anuncios/create-with-images`,
+                `${API_BASE_URL}/api/v1/anuncios/create-with-images`,
                 uploadData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             );
@@ -183,7 +183,7 @@ const AnuncioManager = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Tem certeza que deseja excluir este anúncio?')) return;
         try {
-            await axios.delete(`${API_BASE_URL}/anuncios/delete/${id}`);
+            await axios.delete(`${API_BASE_URL}/api/v1/anuncios/delete/${id}`);
             setAnuncios(prev => prev.filter(a => a.id !== id));
         } catch (err) {
             console.error('Erro ao excluir anúncio:', err);

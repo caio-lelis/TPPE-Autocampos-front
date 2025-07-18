@@ -19,10 +19,10 @@ function Anuncios() {
 
   const fetchAnuncios = async () => {
     try {
-      console.log('Carregando anúncios via API:', `${API_BASE_URL}/anuncios/get`);
+      console.log('Carregando anúncios via API:', `${API_BASE_URL}/api/v1/anuncios/get`);
       setLoading(true);
       console.log('Iniciando requisição fetch');
-      const response = await fetch(`${API_BASE_URL}/anuncios/get`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/anuncios/get`);
       console.log('Resposta fetch:', response);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -32,11 +32,11 @@ function Anuncios() {
       // Enriquecer dados com detalhes de carro e moto
       const enrichedAnuncios = await Promise.all(data.map(async anuncio => {
         if (anuncio.carro_id) {
-          const resCar = await fetch(`${API_BASE_URL}/carros/get/${anuncio.carro_id}`);
+          const resCar = await fetch(`${API_BASE_URL}/api/v1/carros/get/${anuncio.carro_id}`);
           if (resCar.ok) anuncio.carro = await resCar.json();
         }
         if (anuncio.moto_id) {
-          const resMoto = await fetch(`${API_BASE_URL}/motos/get/${anuncio.moto_id}`);
+          const resMoto = await fetch(`${API_BASE_URL}/api/v1/motos/get/${anuncio.moto_id}`);
           if (resMoto.ok) anuncio.moto = await resMoto.json();
         }
         return anuncio;

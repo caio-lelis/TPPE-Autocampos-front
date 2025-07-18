@@ -16,7 +16,7 @@ function DetalhesVeiculo() {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const resAn = await fetch(`${API_BASE_URL}/anuncios/get/${id}`);
+        const resAn = await fetch(`${API_BASE_URL}/api/v1/anuncios/get/${id}`);
         if (!resAn.ok) throw new Error('Erro ao buscar anúncio');
         const anData = await resAn.json();
         setAnuncio(anData);
@@ -25,7 +25,7 @@ function DetalhesVeiculo() {
         setTipoVeiculo(actualTipo);
         const veiculoId = actualTipo === 'carro' ? anData.carro_id : anData.moto_id;
         const endpoint = actualTipo === 'carro' ? 'carros' : 'motos';
-        const resVe = await fetch(`${API_BASE_URL}/${endpoint}/get/${veiculoId}`);
+        const resVe = await fetch(`${API_BASE_URL}/api/v1/${endpoint}/get/${veiculoId}`);
         if (!resVe.ok) throw new Error('Erro ao buscar veículo');
         const veData = await resVe.json();
         setVeiculo(veData);
