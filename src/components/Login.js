@@ -88,6 +88,8 @@ function Login({ setAutenticado, setUserType }) {
       setAutenticado(true);
       // Define o tipo de usuário (admin ou funcionario)
       setUserType(user.tipo);
+      // Armazena o papel do usuário para o Header
+      localStorage.setItem('userRole', user.tipo);
       // Aqui você pode salvar user no contexto/global/localStorage se quiser
       navigate('/home');
     } catch (e) {

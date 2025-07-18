@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import Header from './components/Header';
 import { FiLogOut } from 'react-icons/fi'; // Ícone de logout moderno
 
 import Login from './components/Login';
 import Anuncios from './components/Anuncio';
+import AnuncioManager from './components/AnuncioManager';
+import AnuncioForm from './components/AnuncioForm';
 import Funcionario from './components/Funcionario';
 import Home from './components/Home';
 import HomeAdmin from './components/HomeAdmin'; // Painel do administrador
@@ -30,41 +33,12 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <nav style={navStyles}>
-          <ul style={ulStyles}>
-            <li style={liStyles}><Link to="/home_geral" style={linkStyles}>Home Geral</Link></li>
-            {!autenticado && (
-              <li style={liStyles}><Link to="/login" style={linkStyles}>Login</Link></li>
-            )}
-            {autenticado && (
-              <li style={liStyles}><Link to="/home" style={linkStyles}>Home (Autenticado)</Link></li>
-            )}
-            {/* Links exclusivos para Admin */}
-            {autenticado && userType === 'admin' && (
-              <>
-                <li style={liStyles}><Link to="/usuarios" style={linkStyles}>Gerenciar Usuários</Link></li>
-                <li style={liStyles}><Link to="/funcionarios" style={linkStyles}>Gerenciar Funcionários</Link></li>
-              </>
-            )}
-            {/* Links para Admin e Funcionario */}
-            {autenticado && (userType === 'admin' || userType === 'funcionario') && (
-              <>
-                <li style={liStyles}><Link to="/clientes" style={linkStyles}>Gerenciar Clientes</Link></li>
-                <li style={liStyles}><Link to="/carros" style={linkStyles}>Gerenciar Carros</Link></li>
-                <li style={liStyles}><Link to="/motos" style={linkStyles}>Gerenciar Motos</Link></li>
-                <li style={liStyles}><Link to="/vendas" style={linkStyles}>Gerenciar Vendas</Link></li>
-              </>
-            )}
-            {/* Logout icon */}
-            {autenticado && (
-              <li style={liStyles}>
-                <Link to="/home_geral" style={linkStyles} onClick={() => { setAutenticado(false); setUserType(null); }}>
-                  <FiLogOut /> Logout
-                </Link>
-              </li>
-            )}
-          </ul>
-        </nav>
+        <Header
+          autenticado={autenticado}
+          userType={userType}
+          setAutenticado={setAutenticado}
+          setUserType={setUserType}
+        />
 
         <Routes>
           {/* Redireciona a raiz para /home_geral */}
@@ -191,6 +165,19 @@ function App() {
               <Route
                 path="/vendas/:mode/:id"
                 element={autenticado ? <VendaForm /> : <Navigate to="/login" />}
+              />
+
+              <Route
+                path="/anuncios-admin"
+                element={autenticado ? <AnuncioManager /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/anuncios-admin/:mode"
+                element={autenticado ? <AnuncioForm /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/anuncios-admin/:mode/:id"
+                element={autenticado ? <AnuncioForm /> : <Navigate to="/login" />}
               />
             </>
           )}

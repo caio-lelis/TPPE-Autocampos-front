@@ -1,72 +1,102 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-const veiculosMock = [
-  {
-    id: 1,
-    tipo: 'carro',
-    nome: 'Honda Civic 2020',
-    descricao: 'Sedan confortável, econômico e com ótimo desempenho.',
-    preco: 85000,
-    imagem: 'https://cdn-icons-png.flaticon.com/512/743/743007.png',
-  },
-  {
-    id: 2,
-    tipo: 'moto',
-    nome: 'Yamaha YZF R3',
-    descricao: 'Moto esportiva, ideal para quem busca agilidade e estilo.',
-    preco: 27000,
-    imagem: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-  },
-  {
-    id: 3,
-    tipo: 'carro',
-    nome: 'Ford Ka 2019',
-    descricao: 'Compacto, ideal para uso urbano e fácil de estacionar.',
-    preco: 45000,
-    imagem: 'https://cdn-icons-png.flaticon.com/512/743/743007.png',
-  },
-  {
-    id: 4,
-    tipo: 'moto',
-    nome: 'Honda CB 500X',
-    descricao: 'Moto para aventura, confortável e robusta.',
-    preco: 32000,
-    imagem: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-  },
-];
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function DetalhesVeiculo() {
-  const { tipo, id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const veiculo = veiculosMock.find(v => v.id === parseInt(id, 10) && v.tipo === tipo);
+  const [tipoVeiculo, setTipoVeiculo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [anuncio, setAnuncio] = useState(null);
+  const [veiculo, setVeiculo] = useState(null);
 
-  if (!veiculo) {
-    return (
-      <div style={{ fontFamily: "'Segoe UI', sans-serif", padding: 20, textAlign: 'center' }}>
-        <h2>Veículo não encontrado</h2>
-        <button onClick={() => navigate(-1)} className="btn btn-secondary">Voltar</button>
-      </div>
-    );
-  }
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const resAn = await fetch(`${API_BASE_URL}/anuncios/get/${id}`);
+        if (!resAn.ok) throw new Error('Erro ao buscar anúncio');
+        const anData = await resAn.json();
+        setAnuncio(anData);
+        // Detectar tipo real de veículo do anúncio
+        const actualTipo = anData.carro_id ? 'carro' : 'moto';
+        setTipoVeiculo(actualTipo);
+        const veiculoId = actualTipo === 'carro' ? anData.carro_id : anData.moto_id;
+        const endpoint = actualTipo === 'carro' ? 'carros' : 'motos';
+        const resVe = await fetch(`${API_BASE_URL}/${endpoint}/get/${veiculoId}`);
+        if (!resVe.ok) throw new Error('Erro ao buscar veículo');
+        const veData = await resVe.json();
+        setVeiculo(veData);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetails();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [API_BASE_URL, id]);
+
+  if (loading) return <div className="container py-5">Carregando detalhes...</div>;
+  if (error) return <div className="container py-5 text-danger">{error}</div>;
+
+  const images = [anuncio.imagem1_url, anuncio.imagem2_url, anuncio.imagem3_url].filter(Boolean);
 
   return (
-    <div style={{ fontFamily: "'Segoe UI', sans-serif", padding: 20 }}>
+    <div className="container py-5">
       <button onClick={() => navigate(-1)} className="btn btn-secondary mb-4">Voltar</button>
-      <div className="card mx-auto" style={{ maxWidth: 600, borderRadius: 12, background: '#fffde7', border: '2px solid #FFD600' }}>
-        <img src={veiculo.imagem} alt={veiculo.nome} className="card-img-top p-4" style={{ height: 300, objectFit: 'contain' }} />
-        <div className="card-body">
-          <h3 className="card-title fw-bold" style={{ color: '#111' }}>{veiculo.nome}</h3>
-          <p className="card-text text-secondary" style={{ color: '#333' }}>{veiculo.descricao}</p>
-          <h4 style={{ fontWeight: 700, color: '#111' }}>{formatarPreco(veiculo.preco)}</h4>
+      <h2 className="mb-4 text-capitalize">{tipoVeiculo} Detalhes</h2>
+      <div className="row">
+        <div className="col-md-6">
+          {images.length > 0 ? (
+            <img src={images[0]} alt="Imagem principal" className="img-fluid rounded mb-3" />
+          ) : (
+            <div className="bg-secondary text-white p-5 text-center">Sem imagem</div>
+          )}
+          <div className="d-flex gap-2">
+            {images.map((url, idx) => (
+              <img
+                key={idx}
+                src={url}
+                alt={`Imagem ${idx + 1}`}
+                className="img-thumbnail"
+                style={{ width: 100, cursor: 'pointer' }}
+                onClick={() => window.open(url, '_blank')}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="col-md-6">
+          <ul className="list-group">
+            <li className="list-group-item"><strong>Marca:</strong> {veiculo.marca}</li>
+            <li className="list-group-item"><strong>Modelo:</strong> {veiculo.modelo}</li>
+            <li className="list-group-item"><strong>Ano:</strong> {veiculo.ano}</li>
+            {tipoVeiculo === 'carro' && (
+              <>
+                <li className="list-group-item"><strong>Cor:</strong> {veiculo.cor}</li>
+                <li className="list-group-item"><strong>Combustível:</strong> {veiculo.tipo_combustivel}</li>
+                <li className="list-group-item"><strong>Disponível:</strong> {veiculo.disponivel ? 'Sim' : 'Não'}</li>
+              </>
+            )}
+            {tipoVeiculo === 'moto' && (
+              <>
+                <li className="list-group-item"><strong>Freio Dianteiro:</strong> {veiculo.freio_dianteiro}</li>
+                <li className="list-group-item"><strong>Freio Traseiro:</strong> {veiculo.freio_traseiro}</li>
+                <li className="list-group-item"><strong>Estilo:</strong> {veiculo.estilo}</li>
+                <li className="list-group-item"><strong>Cilindradas:</strong> {veiculo.cilindradas}</li>
+                <li className="list-group-item"><strong>Velocidade Máx.:</strong> {veiculo.velocidade_max}</li>
+              </>
+            )}
+            <li className="list-group-item"><strong>Preço:</strong> R$ {parseFloat(veiculo.preco).toLocaleString('pt-BR')}</li>
+            <li className="list-group-item"><strong>Data Publicação:</strong> {anuncio.data_publicacao}</li>
+            <li className="list-group-item"><strong>Tipo:</strong> {tipoVeiculo === 'carro' ? 'Carro' : 'Moto'}</li>
+          </ul>
         </div>
       </div>
     </div>
   );
-}
-
-function formatarPreco(valor) {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 export default DetalhesVeiculo;
